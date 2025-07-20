@@ -1,0 +1,77 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+using namespace std;
+
+// Game class representing a single game entry
+class Game {
+public:
+    string title;
+    string genre;
+    string platform;
+    int releaseYear;
+    double rating;
+
+    // Constructor
+    Game(string t, string g, string p, int y, double r)
+        : title(t), genre(g), platform(p), releaseYear(y), rating(r) {}
+
+    // Display the game info
+    void display() const {
+        cout << "Title: " << title << endl;
+        cout << "Genre: " << genre << endl;
+        cout << "Platform: " << platform << endl;
+        cout << "Release Year: " << releaseYear << endl;
+        cout << "Rating: " << rating << endl;
+        cout << "-----------------------------" << endl;
+    }
+};
+
+// Function to load games from a CSV file
+vector<Game> loadGames(const string& filename, int limit = 10) {
+    vector<Game> games;
+    ifstream file(filename);
+    string line;
+    int count = 0;
+
+    if (!file.is_open()) {
+        cerr << "Error: Could not open file." << endl;
+        return games;
+    }
+
+    getline(file, line); // Skip header
+
+    while (getline(file, line) && count < limit) {
+        stringstream ss(line);
+        string title, genre, platform, yearStr, ratingStr;
+
+        getline(ss, title, ',');
+        getline(ss, genre, ',');
+        getline(ss, platform, ',');
+        getline(ss, yearStr, ',');
+        getline(ss, ratingStr, ',');
+
+        int year = stoi(yearStr);
+        double rating = stod(ratingStr);
+
+        games.emplace_back(title, genre, platform, year, rating);
+        count++;
+    }
+
+    file.close();
+    return games;
+}
+
+int main() {
+    string filename = "games.csv"; // Make sure this CSV file exists in the project folder
+    vector<Game> games = loadGames(filename);
+
+    cout << "\nTop Video Games:\n";
+    cout << "=============================\n";
+    for (const Game& g : games) {
+        g.display();
+    }
+
+    return 0;
+}
